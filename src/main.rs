@@ -27,7 +27,7 @@ fn main() {
 
         let mut lines = 0;
 
-        clearscreen::clear().expect("Failed to clear screen!");
+        clearscreen::clear().unwrap();
 
         for proc_out in process_output {
             let name = proc_out.name;
