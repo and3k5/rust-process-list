@@ -33,7 +33,7 @@ fn main() {
             let name = proc_out.name;
             let cpu = proc_out.cpu;
             let processes = proc_out.processes;
-            print!("{name} - {cpu} - {processes}");
+            print!("{:<40} {:>8.2} {:>4}", name, cpu, processes);
             lines += 1;
             if lines >= console_height {
                 break;
