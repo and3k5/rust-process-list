@@ -1,3 +1,6 @@
+use std::time::Duration;
+
+use crossterm_cursor::cursor;
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System};
 
 struct ProcessData {
@@ -8,10 +11,14 @@ struct ProcessData {
 
 fn main() {
     let mut s = System::new_all();
+    let mut cursor = cursor();
 
     loop {
         // Wait a bit because CPU usage is based on diff.
         std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+        if sysinfo::MINIMUM_CPU_UPDATE_INTERVAL < Duration::from_secs(1) {
+            std::thread::sleep(std::time::Duration::from_millis(1000 - sysinfo::MINIMUM_CPU_UPDATE_INTERVAL.as_millis() as u64));
+        }
         // Refresh CPU usage to get actual value.
         s.refresh_processes_specifics(
             ProcessesToUpdate::All,
@@ -25,15 +32,18 @@ fn main() {
             None => 24, // default height if unable to determine
         };
 
+        let mut line_output: Vec<String> = Vec::with_capacity(console_height);
+
         let mut lines = 0;
 
-        clearscreen::clear().unwrap();
+        line_output.push(format!("{:<40} {:>8} {:>7}", "Process", "CPU", "# proc"));
+        lines += 1;
 
         for proc_out in process_output {
             let name = proc_out.name;
             let cpu = proc_out.cpu;
             let processes = proc_out.processes;
-            print!("{:<40} {:>8.2} {:>4}", name, cpu, processes);
+            line_output.push(format!("{:<40} {:>8.2} {:>7}", name, cpu, processes));
             lines += 1;
             if lines >= console_height {
                 break;
@@ -41,6 +51,9 @@ fn main() {
                 println!();
             }
         }
+
+        print!("{}", line_output.join("\n"));
+        cursor.move_up(lines as u16).unwrap();
     }
 }
 
