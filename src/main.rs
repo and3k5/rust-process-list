@@ -39,18 +39,26 @@ fn main() {
         line_output.push(format!("{:<40} {:>8} {:>7}", "Process", "CPU", "# proc"));
         lines += 1;
 
+        let mut total_processes: u128 = 0;
+        let mut total_cpu = 0.0;
+
         for proc_out in process_output {
             let name = proc_out.name;
             let cpu = proc_out.cpu;
             let processes = proc_out.processes;
-            line_output.push(format!("{:<40} {:>8.2} {:>7}", name, cpu, processes));
-            lines += 1;
-            if lines >= console_height {
-                break;
+            total_processes += processes as u128;
+            total_cpu += cpu;
+            if lines >= (console_height - 1) {
+                continue;
             } else {
+                line_output.push(format!("{:<40} {:>8.2} {:>7}", name, cpu, processes));
+                lines += 1;
                 println!();
             }
         }
+
+        line_output.push(format!("{:<40} {:>8.2} {:>7}", "Total", total_cpu, total_processes));
+        lines += 1;
 
         print!("{}", line_output.join("\n"));
         cursor.move_up(lines as u16).unwrap();
