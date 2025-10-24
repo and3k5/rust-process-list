@@ -6,7 +6,7 @@ use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System};
 struct ProcessData {
     name: String,
     cpu: f32,
-    processes: u8,
+    processes: u16,
 }
 
 fn main() {
